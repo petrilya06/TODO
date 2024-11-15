@@ -21,17 +21,13 @@ type Bot struct {
 	state State
 }
 
-func NewBot() (*Bot, error) {
+func (b *Bot) Run() {
 	bot, err := tgbotapi.NewBotAPI(os.Getenv("TOKEN"))
 	if err != nil {
-		return nil, err
+		return
 	}
 
-	return &Bot{bot: bot, state: StateStart}, nil
-}
-
-func (b *Bot) Run() {
-	b.bot.Debug = true
+	bot.Debug = true
 
 	updateConfig := tgbotapi.NewUpdate(0)
 	updateConfig.Timeout = 60
@@ -63,11 +59,11 @@ func (b *Bot) handleStart(update *tgbotapi.Update) {
 	if update.Message.Text == "/start" {
 		msg.Text = StartMessage
 		msg.ReplyMarkup = CreateInlineKeyboard()
-	}
 
-	if msg.Text != "" {
-		if _, err := b.bot.Send(msg); err != nil {
-			log.Panic(err)
+		if msg.Text != "" {
+			if _, err := b.bot.Send(msg); err != nil {
+				log.Panic(err)
+			}
 		}
 	}
 }
